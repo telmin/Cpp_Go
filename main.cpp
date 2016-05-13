@@ -77,7 +77,7 @@ public:
     }
 
     // 碁盤描画
-    void draw(void){
+    void draw(void) const{
 	printf("  ");
 	for (int x = 1; x<W_SIZE-1; x++) printf("%d ", x);
 	printf("\n");
@@ -280,7 +280,7 @@ int(* double_array(int array[][9]))[9]{
     return array;
 }
 
-double run(void){
+double run(std::vector<Board>& history){
     clock_t start = clock();
 
     // 碁盤の作成
@@ -296,6 +296,7 @@ double run(void){
     while(passed < 2){
 	int result = player.random_choice(&board);
 	if(result==SUCCESS){
+	    history.push_back(board);
 	    // board.draw();
 	    // usleep(100000); // 1000000=1sec
 	}
@@ -316,6 +317,7 @@ double run(void){
     }
     clock_t end = clock();
     //board.draw();
+    history.push_back(board);
 
     double elap = (double)(end-start)/CLOCKS_PER_SEC;
 
@@ -332,7 +334,15 @@ int main()
     srand((unsigned) time(NULL));
 
     for(size_t i = 0; i < loop_count; ++i) {
-	sum += run();
+	std::vector<Board> history;
+	history.reserve(100);
+	sum += run(history);
+
+	/*
+	for(const auto& h : history) {
+	    h.draw();
+	}
+	*/
     }
 
     sum /= static_cast<double>(loop_count);
