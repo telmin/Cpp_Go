@@ -3,6 +3,7 @@
 #include <time.h>
 #include <vector>
 #include <iostream>
+#include <iomanip>
 #include <map>
 #include <unistd.h> // usleep関数
 #include <time.h>   // for clock()
@@ -279,9 +280,9 @@ int(* double_array(int array[][9]))[9]{
     return array;
 }
 
-int main(void){
+double run(void){
     clock_t start = clock();
-    srand((unsigned) time(NULL));
+
     // 碁盤の作成
     Board board;
     // プレイヤー
@@ -295,7 +296,7 @@ int main(void){
     while(passed < 2){
 	int result = player.random_choice(&board);
 	if(result==SUCCESS){
-	    board.draw();
+	    // board.draw();
 	    // usleep(100000); // 1000000=1sec
 	}
 	// パス判定
@@ -314,9 +315,29 @@ int main(void){
 	}
     }
     clock_t end = clock();
-    board.draw();
-    printf("Time : %f(sec)\n", (double)(end-start)/CLOCKS_PER_SEC);
-    printf("%f(playout/sec)\n", (double)CLOCKS_PER_SEC/(end-start));
-    return 0;
+    //board.draw();
+
+    double elap = (double)(end-start)/CLOCKS_PER_SEC;
+
+    //printf("Time : %f(sec)\n", elap);
+    //printf("%f(playout/sec)\n", (double)CLOCKS_PER_SEC/(end-start));
+
+    return elap;
 }
 
+int main()
+{
+    double sum = 0.0;
+    size_t loop_count = 1000;
+    srand((unsigned) time(NULL));
+
+    for(size_t i = 0; i < loop_count; ++i) {
+	sum += run();
+    }
+
+    sum /= static_cast<double>(loop_count);
+    std::cout << "average time " << sum << " sec. " << std::endl;
+    std::cout << "average playout " << std::setprecision(8) << (double)CLOCKS_PER_SEC / (sum * CLOCKS_PER_SEC) << std::endl;
+
+    return 0;
+}
